@@ -1,0 +1,37 @@
+name: PR auto-merge
+description: Auto-merge a specified PR
+branding:
+  icon: git-pull-request
+inputs:
+  approve-pr:
+    default: false
+    description: Is set to true it will automatically approve the PR
+    required: false
+  github-token:
+    description: Token to use to call GitHub APIs
+    required: true
+  pr:
+    description: PR to merge
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - uses: actions/checkout@v2.4.0
+
+    - name: Auto-approve PR
+      if: inputs.approve-pr
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+      run: |
+        gh pr review --approve "${{ inputs.pr }}"
+
+    - name: Auto-merge PR
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      shell: bash
+      run: |
+        gh pr merge --auto --rebase "${{ inputs.pr }}"
+
